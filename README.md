@@ -16,7 +16,7 @@ How to use:
 Example usage:
 
 ```python
-pipeline = Zero123PlusPipeline.from_pretrained('./zero123pp', torch_dtype=torch.float16)
+pipeline = Zero123PlusPipeline.from_pretrained('sudo-ai/zero123plus-v1.1', torch_dtype=torch.float16)
 pipeline.to('cuda:0')
 pipeline(
   to_rgb_image(Image.open(r"condition.png"))
