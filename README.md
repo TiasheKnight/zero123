@@ -8,19 +8,28 @@ tags:
 - art
 ---
 
-How to use:
+Recommended version of `diffusers` is `0.20.2` with `torch` `2`.
 
-1. Copy or download `inference.py` from files.
-2. Build a `Zero123PlusPipeline` with the checkpoint.
-
-Example usage:
-
+Usage Example:
 ```python
-pipeline = Zero123PlusPipeline.from_pretrained('sudo-ai/zero123plus-v1.1', torch_dtype=torch.float16)
-pipeline.to('cuda:0')
-pipeline(
-  to_rgb_image(Image.open(r"condition.png"))
-).images[0].show()
-```
+import torch
+import requests
+from PIL import Image
+from diffusers import DiffusionPipeline, EulerAncestralDiscreteScheduler
 
-Condition needs to be in gray (127, 127, 127) or transparent (recommended) background.
+# Load the pipeline
+pipeline = DiffusionPipeline.from_pretrained(
+    "sudo-ai/zero123plus-v1.1", custom_pipeline="sudo-ai/zero123plus-pipeline",
+    torch_dtype=torch.float16
+)
+# Feel free to tune the scheduler
+pipeline.scheduler = EulerAncestralDiscreteScheduler.from_config(
+    pipeline.scheduler.config, timestep_spacing='trailing'
+)
+pipeline.to('cuda:0')
+# Run the pipeline
+cond = Image.open(requests.get("https://d.skis.ltd/nrp/sample-data/lysol.png", stream=True).raw)
+result = pipeline(cond).images[0]
+result.show()
+result.save("output.png")
+```
